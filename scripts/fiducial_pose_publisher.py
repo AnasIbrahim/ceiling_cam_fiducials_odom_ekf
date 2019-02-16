@@ -11,7 +11,7 @@ def callback(newPose):
     global publisher, tfListener
 
     try:
-        (trans, rot) = tfListener.lookupTransform('map', 'fid100', rospy.Time(0))
+        (trans, rot) = tfListener.lookupTransform('map', rospy.get_param('~fiducial_code'), rospy.Time(0))
     except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
         return
 
@@ -26,12 +26,13 @@ def callback(newPose):
     pose.pose.pose.orientation.z = rot[2]
     pose.pose.pose.orientation.w = rot[3]
 
-    pose.pose.covariance = [0.1, 0, 0, 0, 0, 0, 
-                            0, 0.1, 0, 0, 0, 0, 
-                            0, 0, 0.1, 0, 0, 0, 
-                            0, 0, 0, 0.1, 0, 0, 
-                            0, 0, 0, 0, 0.1, 0, 
-                            0, 0, 0, 0, 0, 0.1]
+    cov = rospy.get_param('~fiducial_covariance')
+    pose.pose.covariance = [cov, 0, 0, 0, 0, 0, 
+                            0, cov, 0, 0, 0, 0, 
+                            0, 0, cov, 0, 0, 0, 
+                            0, 0, 0, cov, 0, 0, 
+                            0, 0, 0, 0, cov, 0, 
+                            0, 0, 0, 0, 0, cov]
     
     publisher.publish(pose)
 
