@@ -10,14 +10,20 @@ import tf
 def callback(newPose):
     global publisher, tfListener
 
+    fiducial_code = rospy.get_param('~fiducial_code')
+    cov = rospy.get_param('~fiducial_covariance')
+    #x_trans = rospy.get_param('~x_trans')
+    #y_trans = rospy.get_param('~y_trans')
+    #z_trans = rospy.get_param('~z_trans')
+
     try:
-        (trans, rot) = tfListener.lookupTransform('map', rospy.get_param('~fiducial_code'), rospy.Time(0))
+        (trans, rot) = tfListener.lookupTransform('odom', 'fiducial_fix', rospy.Time(0))
     except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
         return
 
     pose = geometry_msgs.msg.PoseWithCovarianceStamped()
     pose.header.stamp = rospy.Time.now()
-    pose.header.frame_id = 'map'
+    pose.header.frame_id = 'odom'
     pose.pose.pose.position.x = trans[0]
     pose.pose.pose.position.y = trans[1]
     pose.pose.pose.position.z = trans[2]
@@ -26,7 +32,6 @@ def callback(newPose):
     pose.pose.pose.orientation.z = rot[2]
     pose.pose.pose.orientation.w = rot[3]
 
-    cov = rospy.get_param('~fiducial_covariance')
     pose.pose.covariance = [cov, 0, 0, 0, 0, 0, 
                             0, cov, 0, 0, 0, 0, 
                             0, 0, cov, 0, 0, 0, 

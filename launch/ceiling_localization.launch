@@ -2,13 +2,15 @@
   <include file="$(find ceiling_cam_fiducials_odom_ekf)/launch/fiducials_detection.launch" />
   
   <include file="$(find ceiling_cam_fiducials_odom_ekf)/launch/ekf_localization.launch" />
+  <!--TODO make fiducial code displacement as args-->
   
   <!-- tf static frames -->
   <node pkg="tf" type="static_transform_publisher" name="map_to_camera_static_pub" args="0.235 0.119 2.325   0.740 0.670 -0.062 -0.012 map camera 10" />
   <node pkg="tf" type="static_transform_publisher" name="map_to_odom_static_pub" args="0 0 0 0 0 0 map odom 10" />
+  <node pkg="tf" type="static_transform_publisher" name="fiducial_to_base_footprint_correct_static_pub" args="0.1285 0 -0.151 0 0 0 fid100 fiducial_fix 10" />
 
   <node pkg="ceiling_cam_fiducials_odom_ekf" type="fiducial_pose_publisher.py" name="fiducial_tf_to_pose_msg_converter">
     <param name="fiducial_code" value="fid100"/>
-    <param name="fiducial_covariance" value="0.03"/>
+    <param name="fiducial_covariance" value="0.05"/>
   </node>
 </launch>
